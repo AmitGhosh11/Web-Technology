@@ -1,4 +1,8 @@
 <?php
+session_start();
+include '../view/db_connection.php';
+
+
 $usernameErr = $emailErr = $passwordErr = "";
 $username = $email = $password = "";
  
@@ -32,6 +36,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
  
     if ($usernameErr == "" && $emailErr == "" && $passwordErr == "") {
+         $sql = "SELECT * FROM admin WHERE username='$username' AND password='$password'";
+        $result = mysqli_query($conn, $sql);
+
+        if (mysqli_num_rows($result) == 1) {
+            // Set session and cookie
+            $_SESSION['username'] = $username;
+            setcookie("username", $username, time() + (86400 * 7), "/"); // 7 days
+
+            header("Location: admin_dashboard.php");
+            exit();
+        } else {
+            echo "<p style='color:red;'>Invalid username or password.</p>";
+        }
         echo "<h3>Admin Registration Successful!</h3>";
     }
 }
